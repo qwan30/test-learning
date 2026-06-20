@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Online Registration Form — Test Design EP & BVA</title>
+  <meta name="description" content="Bài trình bày phân tích test case cho Online Registration Form bằng EP và BVA." />
+  <style>
+    :root {
+      --primary: #181d26;
+      --primary-active: #0d1218;
+      --canvas: #ffffff;
+      --surface-soft: #f8fafc;
+      --surface-strong: #e0e2e6;
+      --surface-dark: #181d26;
+      --surface-dark-elevated: #1d1f25;
+      --hairline: #dddddd;
+      --ink: #181d26;
+      --body: #333840;
+      --muted: #41454d;
+      --border-strong: #9297a0;
+      --on-primary: #ffffff;
+      --signature-coral: #aa2d00;
+      --signature-forest: #0a2e0e;
+      --signature-cream: #f5e9d4;
+      --signature-peach: #fcab79;
+      --signature-mint: #a8d8c4;
+      --signature-yellow: #f4d35e;
+      --signature-mustard: #d9a441;
+      --link: #1b61c9;
+      --info: #254fad;
+      --info-border: #458fff;
+      --success: #006400;
+      --success-border: #39bf45;
+      --space-xxs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-xxl: 48px;
+      --space-section: 96px;
+      --radius-xs: 2px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 12px;
+      --radius-pill: 9999px;
+      --max: 1280px;
+      --shadow-button: 0 8px 20px rgba(27, 97, 201, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      background: rgba(24, 29, 38, 0.06);
+      padding: 2px 5px;
+      border-radius: var(--radius-sm);
+      word-break: break-word;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0%;
+      z-index: 9999;
+      background: var(--signature-coral);
+    }
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 64px;
+      border-bottom: 1px solid rgba(221, 221, 221, 0.82);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(18px);
+    }
+    .nav-inner {
+      max-width: var(--max);
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 var(--space-xxl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-weight: 500;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(135deg, var(--signature-peach) 0 49%, transparent 50%),
+        linear-gradient(45deg, var(--signature-mint) 0 49%, transparent 50%),
+        var(--signature-yellow);
+      border: 1px solid rgba(24, 29, 38, 0.12);
+    }
+    .nav-links {
+      display: flex;
+      gap: var(--space-lg);
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .nav-links a { position: relative; }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -6px;
+      height: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      background: var(--ink);
+      transition: transform 180ms ease;
+    }
+    .nav-links a:focus-visible::after,
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-actions { display: flex; gap: var(--space-xs); align-items: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 12px 18px;
+      border-radius: var(--radius-lg);
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
+    }
+    .btn-primary { background: var(--primary); color: var(--on-primary); box-shadow: var(--shadow-button); }
+    .btn-primary:active { background: var(--primary-active); transform: translateY(1px); }
+    .btn-secondary { background: var(--canvas); color: var(--ink); border-color: var(--hairline); }
+    .btn-small { min-height: 38px; padding: 8px 14px; font-size: 14px; }
+
+    .section { padding: var(--space-section) var(--space-xxl); }
+    .container { max-width: var(--max); margin: 0 auto; }
+    .hero {
+      min-height: calc(100vh - 64px);
+      display: grid;
+      align-items: center;
+      background: var(--canvas);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: var(--space-xxl);
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: var(--space-lg);
+    }
+    .eyebrow-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signature-coral); display: inline-block; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      color: var(--ink);
+      font-size: clamp(42px, 5.8vw, 76px);
+      line-height: 1.02;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      margin-bottom: var(--space-lg);
+    }
+    h2 {
+      color: var(--ink);
+      font-size: clamp(32px, 3.4vw, 48px);
+      line-height: 1.1;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-lg);
+    }
+    h3 {
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: var(--space-sm);
+    }
+    .lead {
+      max-width: 720px;
+      color: var(--body);
+      font-size: 18px;
+      line-height: 1.55;
+      margin-bottom: var(--space-xl);
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+
+    .task-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      min-height: 540px;
+    }
+    .task-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-lg); }
+    .task-card h3 { font-size: 24px; font-weight: 400; }
+    .task-badge {
+      background: var(--signature-cream);
+      border: 1px solid rgba(24,29,38,.08);
+      color: var(--ink);
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .spec-table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: var(--radius-md); background: var(--canvas); }
+    .spec-table th {
+      background: var(--surface-dark);
+      color: var(--on-primary);
+      text-align: left;
+      padding: 13px 12px;
+      font-weight: 500;
+      border-right: 1px solid rgba(255,255,255,.18);
+    }
+    .spec-table td {
+      vertical-align: top;
+      padding: 14px 12px;
+      border: 1px solid var(--hairline);
+      color: var(--body);
+    }
+    .spec-table td:first-child { color: var(--ink); font-weight: 500; }
+    .micro-list { margin: var(--space-lg) 0 0; padding-left: 20px; color: var(--body); }
+    .micro-list li { margin: 8px 0; }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
+    .metric-card {
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline);
+      min-height: 145px;
+    }
+    .metric-number { font-size: 44px; line-height: 1; font-weight: 475; color: var(--ink); letter-spacing: -0.03em; }
+    .metric-label { margin-top: var(--space-sm); color: var(--muted); }
+
+    .signature { border-radius: var(--radius-lg); padding: var(--space-xxl); color: var(--on-primary); overflow: hidden; position: relative; }
+    .signature h2, .signature h3, .signature p { color: var(--on-primary); }
+    .signature p { max-width: 760px; font-size: 16px; line-height: 1.55; opacity: .94; }
+    .signature.coral { background: var(--signature-coral); }
+    .signature.forest { background: var(--signature-forest); }
+    .signature.dark { background: var(--surface-dark); }
+    .signature::after {
+      content: "";
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      right: -120px;
+      top: -160px;
+      background: rgba(255,255,255,.08);
+    }
+
+    .section-kicker {
+      color: var(--signature-coral);
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: var(--space-sm);
+    }
+    .two-col { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: var(--space-xl); align-items: start; }
+    .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+    .qa-card, .decision-card, .partition-card {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+    .qa-card strong, .decision-card strong { color: var(--ink); display: block; margin-bottom: 6px; }
+    .qa-card p, .decision-card p, .partition-card p { margin-bottom: 0; color: var(--body); }
+    .cream-band { background: var(--signature-cream); }
+    .soft-band { background: var(--surface-soft); }
+
+    .token-note {
+      background: var(--canvas);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      border: 1px solid rgba(24,29,38,.12);
+    }
+    .decision-list { display: grid; gap: var(--space-sm); }
+    .decision-row { display: grid; grid-template-columns: 180px 1fr; gap: var(--space-md); padding: 14px 0; border-bottom: 1px solid rgba(24,29,38,.10); }
+    .decision-row:last-child { border-bottom: none; }
+    .decision-row .label { color: var(--ink); font-weight: 500; }
+
+    .partition-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-md); }
+    .partition-card { padding: var(--space-md); background: var(--surface-soft); }
+    .partition-card h3 { font-size: 16px; margin-bottom: var(--space-xs); }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--space-sm); }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--canvas);
+      border: 1px solid rgba(24,29,38,.10);
+      color: var(--ink);
+    }
+    .tag.valid { background: rgba(57,191,69,.10); border-color: rgba(57,191,69,.22); color: var(--success); }
+    .tag.invalid { background: rgba(170,45,0,.08); border-color: rgba(170,45,0,.20); color: var(--signature-coral); }
+
+    .boundary-board {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--space-lg);
+    }
+    .boundary-card {
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      padding: var(--space-lg);
+      min-height: 230px;
+    }
+    .boundary-card h3 { font-size: 18px; }
+    .boundary-values { display: grid; gap: 8px; margin-top: var(--space-md); }
+    .boundary-pill {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      color: var(--ink);
+      border: 1px solid rgba(24,29,38,.08);
+    }
+    .boundary-pill .state { font-weight: 500; }
+    .state.invalid { color: var(--signature-coral); }
+    .state.valid { color: var(--success); }
+
+    .baseline-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md); }
+    .baseline-item { background: var(--canvas); border-radius: var(--radius-md); padding: var(--space-md); border: 1px solid rgba(24,29,38,.10); }
+    .baseline-item span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+    .baseline-item code { background: var(--surface-soft); }
+
+    .table-tools {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+    .filter-group { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+    .filter-btn {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--ink);
+      border-radius: var(--radius-pill);
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .filter-btn.active { background: var(--ink); color: var(--on-primary); border-color: var(--ink); }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+    }
+    .test-table {
+      width: 100%;
+      min-width: 1180px;
+      border-collapse: collapse;
+    }
+    .test-table th {
+      background: var(--surface-dark);
+      color: var(--on-primary);
+      font-weight: 500;
+      text-align: left;
+      padding: 15px 14px;
+      position: sticky;
+      top: 64px;
+      z-index: 4;
+    }
+    .test-table td {
+      vertical-align: top;
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px;
+      color: var(--body);
+    }
+    .test-table tr:last-child td { border-bottom: none; }
+    .input-cell { line-height: 1.85; max-width: 380px; }
+    .tech-badge {
+      display: inline-flex;
+      border-radius: var(--radius-pill);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-ep { background: var(--signature-mint); color: var(--ink); }
+    .badge-bva { background: var(--signature-yellow); color: var(--ink); }
+    .hidden-case { display: none; }
+
+    .checklist { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+    .check-item {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: flex-start;
+      background: var(--canvas);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 1px solid rgba(24,29,38,.10);
+    }
+    .check-icon {
+      flex: 0 0 24px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(57,191,69,.14);
+      color: var(--success);
+      font-weight: 700;
+    }
+    .footer-cta {
+      background: var(--surface-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xxl);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+    .footer-cta h2 { margin-bottom: var(--space-sm); }
+    .footer-cta p { margin-bottom: 0; max-width: 700px; }
+    footer { padding: var(--space-xl) var(--space-xxl); border-top: 1px solid var(--hairline); color: var(--muted); }
+    .footer-inner { max-width: var(--max); margin: 0 auto; display: flex; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; }
+    .print-hint { color: var(--muted); }
+
+    .reveal { opacity: 0; transform: translateY(28px); }
+    .fade-in { opacity: 0; }
+
+    @media (max-width: 1100px) {
+      .hero-grid, .two-col, .footer-cta { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .partition-grid, .boundary-board, .baseline-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+      .task-card { min-height: auto; }
+    }
+    @media (max-width: 760px) {
+      .section { padding: 72px 20px; }
+      .nav-inner { padding: 0 20px; }
+      .nav-actions .btn-secondary { display: none; }
+      h1 { font-size: 44px; }
+      .card-grid, .summary-grid, .partition-grid, .boundary-board, .baseline-grid, .checklist { grid-template-columns: 1fr; }
+      .signature { padding: var(--space-xl); }
+      .decision-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+
+    @media print {
+      .top-nav, .progress, .hero-actions, .table-tools, .btn { display: none !important; }
+      .section { padding: 32px 0; }
+      body { color: #111; }
+      .reveal, .fade-in { opacity: 1 !important; transform: none !important; }
+      .test-table th { position: static; }
+      .table-wrap { overflow: visible; }
+      .test-table { min-width: 0; font-size: 10px; }
+      .signature { color: #fff !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <a href="#hero" class="brand" aria-label="Registration Test Design">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Registration Test Design</span>
+      </a>
+      <div class="nav-links" aria-label="Section navigation">
+        <a href="#scope">Scope</a>
+        <a href="#answers">Assumptions</a>
+        <a href="#ep">EP</a>
+        <a href="#bva">BVA</a>
+        <a href="#cases">Test cases</a>
+      </div>
+      <div class="nav-actions">
+        <a class="btn btn-secondary btn-small" href="#cases">Xem test cases</a>
+        <button class="btn btn-primary btn-small" onclick="window.print()">In / PDF</button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section id="hero" class="section hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow fade-in"><span class="eyebrow-dot"></span> EP + BVA · Online Registration Form</div>
+          <h1 class="hero-title">Phân tích đề bài và thiết kế test case rõ ràng để trình bày với thầy.</h1>
+          <p class="lead fade-in">Bài này không kiểm thử giao diện đẹp hay xấu. Trọng tâm là đọc specification chính xác, tự trả lời các điểm mơ hồ, chia input thành lớp tương đương, chọn giá trị biên và biến chúng thành test cases có giải thích.</p>
+          <div class="hero-actions fade-in">
+            <a class="btn btn-primary" href="#scope">Bắt đầu phân tích</a>
+            <a class="btn btn-secondary" href="#cases">Đi thẳng tới test cases</a>
+          </div>
+        </div>
+        <aside class="task-card reveal" aria-label="Requirement summary">
+          <div class="task-card-head">
+            <div>
+              <h3>Online Registration Form</h3>
+              <p>Field rules là single source of truth.</p>
+            </div>
+            <span class="task-badge">At least 10 cases</span>
+          </div>
+          <table class="spec-table">
+            <thead>
+              <tr><th>Field</th><th>Rule</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Username</td><td>6–20 characters, letters/digits only</td><td>No spaces or symbols; required</td></tr>
+              <tr><td>Password</td><td>8–16 characters</td><td>Must contain at least 1 digit; required</td></tr>
+              <tr><td>Age</td><td>Integer 18–100 inclusive</td><td>Whole numbers only; required</td></tr>
+              <tr><td>Email</td><td>Valid format name@domain.tld</td><td>Max 50 characters; required</td></tr>
+              <tr><td>Phone</td><td>Exactly 10 digits</td><td>Digits only; required</td></tr>
+            </tbody>
+          </table>
+          <ul class="micro-list">
+            <li>Mỗi test case gồm ID, input data, technique, expected result, explanation.</li>
+            <li>Kỹ thuật bắt buộc: Equivalence Partitioning và Boundary Value Analysis.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="scope" class="section soft-band">
+      <div class="container">
+        <div class="section-kicker reveal">1 · Hiểu đúng đề bài</div>
+        <h2 class="reveal">Kết luận nhanh sau khi phân tích yêu cầu</h2>
+        <div class="summary-grid">
+          <div class="metric-card reveal"><div class="metric-number" data-count="5">0</div><div class="metric-label">field bắt buộc cần validation</div></div>
+          <div class="metric-card reveal"><div class="metric-number" data-count="2">0</div><div class="metric-label">kỹ thuật chính: EP và BVA</div></div>
+          <div class="metric-card reveal"><div class="metric-number" data-count="23">0</div><div class="metric-label">test cases đề xuất, nhiều hơn mức tối thiểu</div></div>
+          <div class="metric-card reveal"><div class="metric-number" data-count="1">0</div><div class="metric-label">nguồn sự thật: bảng rule trong đề</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container signature coral reveal">
+        <div class="section-kicker" style="color: rgba(255,255,255,.78)">Core principle</div>
+        <h2>Không tự thêm rule ngoài đề bài.</h2>
+        <p>Ví dụ: đề không yêu cầu password phải có chữ hoa, không yêu cầu phone bắt đầu bằng số 0, không yêu cầu email theo toàn bộ chuẩn RFC. Vì vậy expected result phải đi theo specification, không đi theo cảm tính.</p>
+      </div>
+    </section>
+
+    <section id="answers" class="section cream-band">
+      <div class="container two-col">
+        <div class="token-note reveal">
+          <div class="section-kicker">2 · Tự trả lời câu hỏi mơ hồ</div>
+          <h2>Assumptions dùng để làm bài nhất quán</h2>
+          <p>Các câu trả lời này giúp bài test case không bị mâu thuẫn. Khi trình bày, có thể nói: “Vì đề bài không nói thêm, em chọn assumption tối thiểu và bám sát specification.”</p>
+        </div>
+        <div class="decision-list">
+          <div class="decision-row reveal"><div class="label">Scope</div><div>Chỉ kiểm thử validation của form khi submit. Không test database, đăng nhập, bảo mật nâng cao, responsive hay trình duyệt.</div></div>
+          <div class="decision-row reveal"><div class="label">Required</div><div>Cả 5 field đều bắt buộc. Field rỗng sẽ bị reject với lỗi required tương ứng.</div></div>
+          <div class="decision-row reveal"><div class="label">Username</div><div>Chỉ chấp nhận chữ cái tiếng Anh A–Z, a–z và chữ số 0–9; không chấp nhận space, underscore, dấu tiếng Việt hoặc symbol.</div></div>
+          <div class="decision-row reveal"><div class="label">Password</div><div>Chỉ áp dụng 2 rule: độ dài 8–16 và có ít nhất 1 chữ số. Ký tự đặc biệt không bị reject nếu vẫn thỏa 2 rule này.</div></div>
+          <div class="decision-row reveal"><div class="label">Age</div><div>Phải là số nguyên trong đoạn 18–100, bao gồm cả 18 và 100. Decimal như 18.5 bị reject.</div></div>
+          <div class="decision-row reveal"><div class="label">Email</div><div>Dùng format cơ bản name@domain.tld, tối đa 50 ký tự. Không cần kiểm thử toàn bộ chuẩn email RFC.</div></div>
+          <div class="decision-row reveal"><div class="label">Phone</div><div>Chỉ chấp nhận đúng 10 chữ số liên tiếp. Không chấp nhận +84, dấu cách, dấu gạch ngang, chữ cái.</div></div>
+          <div class="decision-row reveal"><div class="label">Test strategy</div><div>Khi test một field sai, các field còn lại giữ valid baseline để cô lập nguyên nhân lỗi.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-kicker reveal">3 · Những câu hỏi quan trọng và câu trả lời</div>
+        <h2 class="reveal">Q&A dùng khi thầy hỏi vì sao chọn test case</h2>
+        <div class="card-grid">
+          <div class="qa-card reveal"><strong>Có cần test all valid không?</strong><p>Có. Đây là happy path chứng minh form chấp nhận dữ liệu hợp lệ.</p></div>
+          <div class="qa-card reveal"><strong>Có cần test all empty không?</strong><p>Có. Vì tất cả field đều required, đây là partition không hợp lệ quan trọng.</p></div>
+          <div class="qa-card reveal"><strong>Có cần test nhiều field sai cùng lúc không?</strong><p>Có thể có 1 case all empty, nhưng phần lớn case nên chỉ sai 1 field để dễ xác định lỗi.</p></div>
+          <div class="qa-card reveal"><strong>EP dùng ở đâu?</strong><p>Dùng để đại diện nhóm input hợp lệ và không hợp lệ: rỗng, sai format, sai character type, thiếu digit, không phải integer.</p></div>
+          <div class="qa-card reveal"><strong>BVA dùng ở đâu?</strong><p>Dùng cho min/max length và range: Username 5/6/20/21, Password 7/8/16/17, Age 17/18/100/101, Email 50/51, Phone 9/10/11.</p></div>
+          <div class="qa-card reveal"><strong>Expected result nên ghi thế nào?</strong><p>Valid thì accepted/registration successful. Invalid thì rejected và nêu lỗi field cụ thể.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ep" class="section soft-band">
+      <div class="container">
+        <div class="section-kicker reveal">4 · Equivalence Partitioning</div>
+        <h2 class="reveal">Chia lớp tương đương cho từng field</h2>
+        <div class="partition-grid">
+          <div class="partition-card reveal"><h3>Username</h3><p>Hợp lệ khi 6–20 ký tự và chỉ chữ/số.</p><div class="tag-list"><span class="tag valid">valid 6–20</span><span class="tag invalid">&lt; 6</span><span class="tag invalid">&gt; 20</span><span class="tag invalid">space/symbol</span><span class="tag invalid">empty</span></div></div>
+          <div class="partition-card reveal"><h3>Password</h3><p>Hợp lệ khi 8–16 ký tự và có ít nhất 1 digit.</p><div class="tag-list"><span class="tag valid">valid 8–16 + digit</span><span class="tag invalid">&lt; 8</span><span class="tag invalid">&gt; 16</span><span class="tag invalid">no digit</span><span class="tag invalid">empty</span></div></div>
+          <div class="partition-card reveal"><h3>Age</h3><p>Hợp lệ khi là số nguyên từ 18 đến 100 inclusive.</p><div class="tag-list"><span class="tag valid">18–100</span><span class="tag invalid">&lt; 18</span><span class="tag invalid">&gt; 100</span><span class="tag invalid">decimal</span><span class="tag invalid">text</span><span class="tag invalid">empty</span></div></div>
+          <div class="partition-card reveal"><h3>Email</h3><p>Hợp lệ khi đúng format và không quá 50 ký tự.</p><div class="tag-list"><span class="tag valid">name@domain.tld</span><span class="tag invalid">missing @</span><span class="tag invalid">missing domain</span><span class="tag invalid">missing tld</span><span class="tag invalid">&gt; 50</span><span class="tag invalid">empty</span></div></div>
+          <div class="partition-card reveal"><h3>Phone</h3><p>Hợp lệ khi đúng 10 chữ số.</p><div class="tag-list"><span class="tag valid">10 digits</span><span class="tag invalid">9 digits</span><span class="tag invalid">11 digits</span><span class="tag invalid">letters</span><span class="tag invalid">symbols</span><span class="tag invalid">empty</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bva" class="section">
+      <div class="container">
+        <div class="section-kicker reveal">5 · Boundary Value Analysis</div>
+        <h2 class="reveal">Các giá trị biên cần ưu tiên</h2>
+        <div class="boundary-board">
+          <div class="boundary-card reveal"><h3>Username length</h3><div class="boundary-values"><div class="boundary-pill"><span>5 chars</span><span class="state invalid">Invalid</span></div><div class="boundary-pill"><span>6 chars</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>20 chars</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>21 chars</span><span class="state invalid">Invalid</span></div></div></div>
+          <div class="boundary-card reveal"><h3>Password length</h3><div class="boundary-values"><div class="boundary-pill"><span>7 chars</span><span class="state invalid">Invalid</span></div><div class="boundary-pill"><span>8 chars + digit</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>16 chars + digit</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>17 chars</span><span class="state invalid">Invalid</span></div></div></div>
+          <div class="boundary-card reveal"><h3>Age range</h3><div class="boundary-values"><div class="boundary-pill"><span>17</span><span class="state invalid">Invalid</span></div><div class="boundary-pill"><span>18</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>100</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>101</span><span class="state invalid">Invalid</span></div></div></div>
+          <div class="boundary-card reveal"><h3>Email length</h3><div class="boundary-values"><div class="boundary-pill"><span>49 chars</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>50 chars</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>51 chars</span><span class="state invalid">Invalid</span></div></div></div>
+          <div class="boundary-card reveal"><h3>Phone length</h3><div class="boundary-values"><div class="boundary-pill"><span>9 digits</span><span class="state invalid">Invalid</span></div><div class="boundary-pill"><span>10 digits</span><span class="state valid">Valid</span></div><div class="boundary-pill"><span>11 digits</span><span class="state invalid">Invalid</span></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cream-band">
+      <div class="container">
+        <div class="section-kicker reveal">6 · Baseline data</div>
+        <h2 class="reveal">Bộ dữ liệu hợp lệ dùng làm nền</h2>
+        <p class="lead reveal">Khi muốn kiểm thử một lỗi cụ thể, chỉ thay đổi field đang test; các field còn lại giữ nguyên baseline để test case có nguyên nhân rõ ràng.</p>
+        <div class="baseline-grid">
+          <div class="baseline-item reveal"><span>Username</span><code>user123</code></div>
+          <div class="baseline-item reveal"><span>Password</span><code>pass1234</code></div>
+          <div class="baseline-item reveal"><span>Age</span><code>25</code></div>
+          <div class="baseline-item reveal"><span>Email</span><code>user@example.com</code></div>
+          <div class="baseline-item reveal"><span>Phone</span><code>0123456789</code></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cases" class="section">
+      <div class="container">
+        <div class="section-kicker reveal">7 · Final test case set</div>
+        <h2 class="reveal">23 test cases hoàn chỉnh, có EP/BVA và giải thích</h2>
+        <p class="lead reveal">Đề bài yêu cầu ít nhất 10 test cases. Bộ này dùng 23 cases để cover đầy đủ hơn các rule quan trọng và các boundary dễ phát sinh lỗi.</p>
+        <div class="table-tools reveal">
+          <div class="filter-group" aria-label="Filter test cases">
+            <button class="filter-btn active" data-filter="ALL">Tất cả</button>
+            <button class="filter-btn" data-filter="EP">Chỉ EP</button>
+            <button class="filter-btn" data-filter="BVA">Chỉ BVA</button>
+          </div>
+          <div class="print-hint">Tip: bấm “In / PDF” để nộp như tài liệu.</div>
+        </div>
+        <div class="table-wrap reveal">
+          <table class="test-table">
+            <thead>
+              <tr>
+                <th style="width:110px">Test Case ID</th>
+                <th style="width:380px">Input Data</th>
+                <th style="width:110px">Technique</th>
+                <th style="width:250px">Expected Result</th>
+                <th>Giải thích vì sao chọn</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+      <tr class="case-row" data-technique="EP">
+        <td><strong>TC_REG_001</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-ep">EP</span></td>
+        <td>Accepted — form đăng ký thành công.</td>
+        <td>Đại diện lớp tương đương hợp lệ: tất cả field thỏa specification.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="EP">
+        <td><strong>TC_REG_002</strong></td>
+        <td class="input-cell"><b>Username</b>: <code></code><br><b>Password</b>: <code></code><br><b>Age</b>: <code></code><br><b>Email</b>: <code></code><br><b>Phone</b>: <code></code></td>
+        <td><span class="tech-badge badge-ep">EP</span></td>
+        <td>Rejected — hiển thị lỗi required cho Username, Password, Age, Email, Phone.</td>
+        <td>Đại diện lớp tương đương không hợp lệ: tất cả field bắt buộc bị bỏ trống.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_003</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>abc12</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Username phải có tối thiểu 6 ký tự.</td>
+        <td>Giá trị ngay dưới biên dưới của Username: 5 ký tự.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_004</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>abc123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Accepted.</td>
+        <td>Giá trị tại biên dưới hợp lệ của Username: đúng 6 ký tự.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_005</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user1234567890123456</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Accepted.</td>
+        <td>Giá trị tại biên trên hợp lệ của Username: đúng 20 ký tự.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_006</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user12345678901234567</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Username tối đa 20 ký tự.</td>
+        <td>Giá trị ngay ngoài biên trên của Username: 21 ký tự.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="EP">
+        <td><strong>TC_REG_007</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user_123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-ep">EP</span></td>
+        <td>Rejected — Username chỉ được chứa chữ và số.</td>
+        <td>Đại diện partition không hợp lệ: có ký tự đặc biệt “_”.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_008</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass123</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Password phải có tối thiểu 8 ký tự.</td>
+        <td>Giá trị ngay dưới biên dưới của Password: 7 ký tự.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_009</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Accepted.</td>
+        <td>Giá trị tại biên dưới hợp lệ của Password: 8 ký tự và có ít nhất 1 số.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="EP">
+        <td><strong>TC_REG_010</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>password</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-ep">EP</span></td>
+        <td>Rejected — Password phải chứa ít nhất 1 chữ số.</td>
+        <td>Đại diện partition không hợp lệ: đủ độ dài nhưng thiếu chữ số.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_011</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234567890123</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Password tối đa 16 ký tự.</td>
+        <td>Giá trị ngay ngoài biên trên của Password: 17 ký tự.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_012</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>17</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Age phải từ 18 trở lên.</td>
+        <td>Giá trị ngay dưới biên dưới của Age: 17.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_013</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>18</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Accepted.</td>
+        <td>Giá trị tại biên dưới hợp lệ của Age: 18 inclusive.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_014</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>100</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Accepted.</td>
+        <td>Giá trị tại biên trên hợp lệ của Age: 100 inclusive.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_015</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>101</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Age không được lớn hơn 100.</td>
+        <td>Giá trị ngay ngoài biên trên của Age: 101.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="EP">
+        <td><strong>TC_REG_016</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>18.5</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-ep">EP</span></td>
+        <td>Rejected — Age phải là số nguyên.</td>
+        <td>Đại diện partition không hợp lệ: số thập phân, không phải integer.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="EP">
+        <td><strong>TC_REG_017</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>userexample.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-ep">EP</span></td>
+        <td>Rejected — Email phải đúng format name@domain.tld.</td>
+        <td>Đại diện partition sai format: thiếu ký tự @.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_018</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Accepted.</td>
+        <td>Giá trị tại biên trên hợp lệ của Email: đúng 50 ký tự và đúng format.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_019</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Email tối đa 50 ký tự.</td>
+        <td>Giá trị ngay ngoài biên trên của Email: 51 ký tự.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_020</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Phone phải đúng 10 chữ số.</td>
+        <td>Giá trị ngay dưới độ dài bắt buộc của Phone: 9 chữ số.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_021</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>0123456789</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Accepted.</td>
+        <td>Giá trị đúng độ dài bắt buộc của Phone: 10 chữ số.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="BVA">
+        <td><strong>TC_REG_022</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>01234567890</code></td>
+        <td><span class="tech-badge badge-bva">BVA</span></td>
+        <td>Rejected — Phone phải đúng 10 chữ số.</td>
+        <td>Giá trị ngay trên độ dài bắt buộc của Phone: 11 chữ số.</td>
+      </tr>
+
+      <tr class="case-row" data-technique="EP">
+        <td><strong>TC_REG_023</strong></td>
+        <td class="input-cell"><b>Username</b>: <code>user123</code><br><b>Password</b>: <code>pass1234</code><br><b>Age</b>: <code>25</code><br><b>Email</b>: <code>user@example.com</code><br><b>Phone</b>: <code>01234abc89</code></td>
+        <td><span class="tech-badge badge-ep">EP</span></td>
+        <td>Rejected — Phone chỉ được chứa chữ số.</td>
+        <td>Đại diện partition không hợp lệ: có chữ cái trong số điện thoại.</td>
+      </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft-band">
+      <div class="container two-col">
+        <div class="signature dark reveal">
+          <div class="section-kicker" style="color: rgba(255,255,255,.75)">8 · Coverage checklist</div>
+          <h2>Checklist chứng minh bài đã cover đúng yêu cầu</h2>
+          <p>Checklist này giúp phần trình bày kết thúc chắc chắn: đã có valid path, invalid path, required, format, range, length và character rule.</p>
+        </div>
+        <div class="checklist">
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Happy path</strong><br>Tất cả dữ liệu hợp lệ được accepted.</div></div>
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Required fields</strong><br>All empty case kiểm tra toàn bộ field bắt buộc.</div></div>
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Username</strong><br>Min/max length và ký tự không hợp lệ.</div></div>
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Password</strong><br>Min/max length và thiếu digit.</div></div>
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Age</strong><br>Range 18–100 inclusive và integer only.</div></div>
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Email</strong><br>Format cơ bản và max length 50.</div></div>
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Phone</strong><br>Exactly 10 digits và digits only.</div></div>
+          <div class="check-item reveal"><span class="check-icon">✓</span><div><strong>Technique clarity</strong><br>Mỗi case ghi rõ EP hoặc BVA.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container footer-cta reveal">
+        <div>
+          <h2>Kết luận để trình bày</h2>
+          <p>Em thiết kế test cases bằng cách lấy bảng rule làm nguồn sự thật, đặt assumption tối thiểu, chia lớp tương đương bằng EP, chọn giá trị sát biên bằng BVA và dùng baseline valid data để cô lập từng lỗi.</p>
+        </div>
+        <a class="btn btn-primary" href="#hero">Quay lại đầu bài</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>Online Registration Form · EP + BVA Test Design</div>
+      <div>Designed with Airtable-inspired tokens · GSAP scroll animation</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script>
+    (function () {
+      const progress = document.querySelector('.progress');
+      function updateProgress() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+        progress.style.width = pct + '%';
+      }
+      updateProgress();
+      window.addEventListener('scroll', updateProgress, { passive: true });
+
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const rows = document.querySelectorAll('.case-row');
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          rows.forEach(row => {
+            const show = filter === 'ALL' || row.dataset.technique === filter;
+            row.classList.toggle('hidden-case', !show);
+          });
+          if (window.gsap) {
+            gsap.fromTo('.case-row:not(.hidden-case)', { opacity: 0, y: 10 }, { opacity: 1, y: 0, stagger: 0.015, duration: 0.25, ease: 'power2.out' });
+          }
+        });
+      });
+
+      document.addEventListener('keydown', (event) => {
+        const sections = Array.from(document.querySelectorAll('main > section'));
+        const currentIndex = sections.findIndex(sec => sec.getBoundingClientRect().top > 20);
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          const target = sections[Math.min(sections.length - 1, Math.max(0, currentIndex))];
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          const previous = sections[Math.max(0, currentIndex - 2)];
+          previous.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+
+      if (window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.hero-title', { y: 36, opacity: 0, duration: 0.9, ease: 'power3.out' });
+        gsap.to('.fade-in', { opacity: 1, y: 0, stagger: 0.12, duration: 0.65, ease: 'power2.out', delay: 0.2 });
+        gsap.utils.toArray('.reveal').forEach((el) => {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            duration: 0.72,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: el, start: 'top 86%', once: true }
+          });
+        });
+        gsap.utils.toArray('.metric-number').forEach((el) => {
+          const target = Number(el.dataset.count || 0);
+          const obj = { value: 0 };
+          gsap.to(obj, {
+            value: target,
+            duration: 1.1,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+            onUpdate: () => { el.textContent = Math.round(obj.value); }
+          });
+        });
+        gsap.fromTo('.brand-mark', { rotate: -8, scale: .9 }, { rotate: 0, scale: 1, duration: .8, ease: 'elastic.out(1, .55)' });
+      } else {
+        document.querySelectorAll('.reveal, .fade-in, .hero-title').forEach(el => {
+          el.style.opacity = 1;
+          el.style.transform = 'none';
+        });
+        document.querySelectorAll('.metric-number').forEach(el => el.textContent = el.dataset.count || '0');
+      }
+    })();
+  </script>
+</body>
+</html>
